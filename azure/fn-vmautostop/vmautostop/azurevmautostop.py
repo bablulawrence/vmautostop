@@ -179,8 +179,8 @@ class VirtualMachine:
         instance_status = self.get_instance_status()
         metrics = self.get_metrics(timestamp)
         if instance_status == "PowerState/running":
-            if metrics["percentage_cpu_stdev"] < metrics["percent_cpu_stdev_max"] \
-                    and metrics["network_out_stdev"] < metrics["network_out_stdev_max"]:
+            if metrics["percentage_cpu_stdev"] <= metrics["percent_cpu_stdev_max"] \
+                    and metrics["network_out_stdev"] <= metrics["network_out_stdev_max"]:
                 warning_email_timestamp = self.__get_warning_email_timestamp()
                 if warning_email_timestamp == None:
                     if self.__send_warning(timestamp):
