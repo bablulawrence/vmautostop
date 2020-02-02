@@ -11,10 +11,12 @@ az functionapp create --name fn-vmautostop --resource-group rg-vmautostop \
     --os-type Linux --runtime python --runtime-version 3.7 \
     --storage-account stgvmautostop
 
-az functionapp create --name fn-vmautostop-1 --resource-group rg-vmautostop-1 \
-    --consumption-plan-location westus \
+az appservice plan create --name asp-vmautostop --resource-group rg-vmautostop --is-linux --number-of-workers 4 --sku S1
+
+az functionapp create --name fn-vmautostop --resource-group rg-vmautostop \
+    --plan asp-vmautostop \
     --os-type Linux --runtime python --runtime-version 3.7 \
-    --storage-account stgvmautostop1
+    --storage-account stgvmautostop
 
 az functionapp config appsettings list --name fn-vmautostop \
     --resource-group rg-vmautostop 
