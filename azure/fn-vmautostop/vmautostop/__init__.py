@@ -9,13 +9,14 @@ import azure.functions
 
 email_api_key = os.environ.get('SENDGRID_API_KEY')
 warning_email_from = os.environ.get('WARNING_EMAIL_FROM')
-default_warning_email_to = os.environ.get('DEFAULT_WARNING_EMAIL_TO')
+default_warning_email_to = os.environ.get('WARNING_EMAIL_TO')
 default_inactivity_th_mins = float(os.environ.get(
-    'DEFAULT_INACTIVITY_THRESHOLD_MINUTES'))
-post_warning_th_mins = float(os.environ.get('POST_WARNING_THRESHOLD_MINS'))
-percentage_cpu_stdev_bas_pct = float(os.environ.get(
+    'INACTIVITY_THRESHOLD_MINUTES'))
+default_post_warning_th_mins = float(
+    os.environ.get('POST_WARNING_THRESHOLD_MINS'))
+default_percentage_cpu_stdev_bas_pct = float(os.environ.get(
     'PERCENTAGE_CPU_STDEV_BASELINE_PERCENTAGE'))
-network_out_stdev_bas_pct = float(os.environ.get(
+default_network_out_stdev_bas_pct = float(os.environ.get(
     'NETWORK_OUT_STDEV_BASELINE_PERCENTAGE'))
 
 
@@ -32,8 +33,8 @@ def main(timer: azure.functions.TimerRequest) -> None:
                                default_warning_email_to)
     virtual_machines = list(
         itertools.chain.from_iterable(
-            [sub.get_virtual_machines(default_inactivity_th_mins, post_warning_th_mins,
-                                      percentage_cpu_stdev_bas_pct, network_out_stdev_bas_pct)
+            [sub.get_virtual_machines(default_inactivity_th_mins, default_post_warning_th_mins,
+                                      default_percentage_cpu_stdev_bas_pct, default_network_out_stdev_bas_pct)
              for sub in Subscription.get_subscriptions(credentials,
                                                        email_client)]
         )
