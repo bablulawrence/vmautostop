@@ -221,13 +221,14 @@ class VirtualMachine:
             if (metrics["percentage_cpu_stdev"] <= metrics["percent_cpu_stdev_max"]
                     and metrics["network_out_stdev"] <= metrics["network_out_stdev_max"]):
                 warning_email_timestamp = self.__get_warning_email_timestamp()
-                if warning_email_timestamp is not None:
+                if warning_email_timestamp is None:
                     if self.__send_warning(timestamp):
                         self.__set_warning_email_timestamp(timestamp)
                         action = "Warning sent"
                     else:
                         action = "Warning failed"
-                elif divmod((timestamp - warning_email_timestamp).seconds, 60)[0] >= self.post_warning_th_mins:
+                elif divmod(((timestamp - warning_email_timestamp).seconds,
+                             60)[0] >= self.post_warning_th_mins):
                     action = "Stopping"
                     self.__delete_warning_email_timestamp()
                     async_vm_deallocate = self.subscription.compute_client.virtual_machines.deallocate(
