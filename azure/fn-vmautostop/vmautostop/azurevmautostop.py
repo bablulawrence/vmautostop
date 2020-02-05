@@ -227,8 +227,7 @@ class VirtualMachine:
                         action = "Warning sent"
                     else:
                         action = "Warning failed"
-                elif divmod(((timestamp - warning_email_timestamp).seconds,
-                             60)[0] >= self.post_warning_th_mins):
+                elif divmod((timestamp - warning_email_timestamp).seconds, 60)[0] >= self.post_warning_th_mins:
                     action = "Stopping"
                     self.__delete_warning_email_timestamp()
                     async_vm_deallocate = self.subscription.compute_client.virtual_machines.deallocate(
