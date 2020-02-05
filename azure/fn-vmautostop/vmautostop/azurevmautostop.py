@@ -202,7 +202,7 @@ class VirtualMachine:
 
     def __send_warning(self, timestamp):
         subject = f"VM Auto Stop Warning: {timestamp.strftime('%Y-%m-%dT%H:%M:%SZ')} - {self.name}"
-        body = (f"Virtual Machine - <strong > {self.resource_id} < /strong > is inactive "
+        body = (f"Virtual Machine - <strong> {self.resource_id} </strong> is inactive "
                 f"and will be stopped in {self.post_warning_th_mins} mins")
         try:
             self.subscription.email_client.send_message(
