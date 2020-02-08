@@ -47,10 +47,17 @@ az group deployment create --resource-group rg-vmautostop1 \
     --template-file vmautostop-func-cons.json --parameters @vmautostop-func-cons.parameters.json 
 
 az group deployment create --resource-group rg-vmautostop1 \
-    --template-file vmautostop-func-cons.json \
+    --template-file vmautostop-func-dynamic.json \
+    --parameters '{ "sendGridApiKey": {"value": "yourSgkey"}, 
+                    "warningEmailFrom": {"value": "vmautostop@youremail.com"}, 
+                    "warningEmailTo" :{"value": "John.Doe@youremail.com"}}'
+
+az group deployment create --resource-group rg-vmautostop3 \
+    --template-file vmautostop-func-dedicated.json \
     --parameters '{ "sendGridApiKey": {"value": "yourSgkey"}, 
                     "warningEmailFrom": {"value": "vmautostop@youremail.com"}, 
                     "warningEmailTo" :{"value": "John.Doe@youremail.com"}}'
 
 az storage account keys list --account-name stgvasaie6jbczrs3bk
 func azure functionapp publish fn-vmautostop-aie6jbczrs3bk --build remote --publish-local-settings
+func azure functionapp publish fn-vmautostop-qdyj3x6uay7nc --build remote 

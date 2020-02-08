@@ -45,10 +45,10 @@
   },
   "variables": {
     "appName": "[parameters('appName')]",
-    "functionAppName": "[concat(variables('appName'),'-', uniquestring(resourceGroup().id))]",
+    "functionAppName": "[concat(variables('appName'),'-', uniquestring(resourceGroup().id, deployment().name))]",
     "hostingPlanName": "[variables('appName')]",
     "applicationInsightsName": "[variables('appName')]",
-    "storageAccountName": "[concat('stgvas', uniquestring(resourceGroup().id))]",
+    "storageAccountName": "[concat('stgvas', uniquestring(resourceGroup().id, deployment().name))]",
     "storageAccountid": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
     "functionWorkerRuntime": "python"
   },
@@ -74,7 +74,8 @@
       },
       "properties": {
         "name": "[variables('hostingPlanName')]",
-        "computeMode": "Dynamic"
+        "computeMode": "Dynamic",
+        "reserved": "true"
       }
     },
     {

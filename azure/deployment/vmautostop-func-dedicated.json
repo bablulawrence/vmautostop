@@ -1,0 +1,197 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "appName": {
+      "type": "string",
+      "defaultValue": "fn-vmautostop",
+      "metadata": {
+        "description": "App name"
+      }
+    },
+    "sku": {
+      "type": "string",
+      "defaultValue": "S1",
+      "metaData": {
+        "description": "pricing tier for the hosting plan"
+      }
+    },
+    "workerSize": {
+      "type": "string",
+      "defaultValue": "2",
+      "metadata": {
+        "description": "The instance size of the hosting plan."
+      }
+    },
+    "storageAccountType": {
+      "type": "string",
+      "defaultValue": "Standard_LRS",
+      "allowedValues": ["Standard_LRS", "Standard_GRS", "Standard_RAGRS"],
+      "metadata": {
+        "description": "Storage Account type"
+      }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Location for all resources."
+      }
+    },
+    "sendGridApiKey": {
+      "type": "string",
+      "metadata": {
+        "description": "Send Grid API Key"
+      }
+    },
+    "warningEmailFrom": {
+      "type": "string",
+      "metadata": {
+        "description": "Sender email id for the warning email"
+      }
+    },
+    "warningEmailTo": {
+      "type": "string",
+      "metadata": {
+        "description": "Recipient email id for the warning email"
+      }
+    }
+  },
+  "variables": {
+    "appName": "[parameters('appName')]",
+    "functionAppName": "[concat(variables('appName'),'-', uniquestring(resourceGroup().id, deployment().name))]",
+    "hostingPlanName": "[variables('appName')]",
+    "applicationInsightsName": "[variables('appName')]",
+    "storageAccountName": "[concat('stgvas', uniquestring(resourceGroup().id, deployment().name))]",
+    "storageAccountid": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
+    "functionWorkerRuntime": "python"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "name": "[variables('storageAccountName')]",
+      "apiVersion": "2019-04-01",
+      "location": "[parameters('location')]",
+      "kind": "Storage",
+      "sku": {
+        "name": "[parameters('storageAccountType')]"
+      }
+    },
+    {
+      "type": "Microsoft.Web/serverfarms",
+      "apiVersion": "2019-08-01",
+      "name": "[variables('hostingPlanName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "[parameters('sku')]"
+      },
+      "properties": {
+        "name": "[variables('hostingPlanName')]",
+        "workerSize": "[parameters('workerSize')]",
+        "numberOfWorkers": 1,
+        "reserved": true
+      }
+    },
+    {
+      "apiVersion": "2019-08-01",
+      "type": "Microsoft.Web/sites",
+      "name": "[variables('functionAppName')]",
+      "location": "[parameters('location')]",
+      "kind": "functionapp",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
+      ],
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "properties": {
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
+        "siteConfig": {
+          "alwaysOn": true,
+          "appSettings": [
+            {
+              "name": "AzureWebJobsStorage",
+              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(variables('storageAccountid'),'2015-05-01-preview').key1)]"
+            },
+            {
+              "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
+              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(variables('storageAccountid'),'2015-05-01-preview').key1)]"
+            },
+            {
+              "name": "WEBSITE_CONTENTSHARE",
+              "value": "[toLower(variables('functionAppName'))]"
+            },
+            {
+              "name": "FUNCTIONS_EXTENSION_VERSION",
+              "value": "~3"
+            },
+            {
+              "name": "WEBSITE_NODE_DEFAULT_VERSION",
+              "value": "~10"
+            },
+            {
+              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+              "value": "[reference(resourceId('microsoft.insights/components/', variables('applicationInsightsName')), '2015-05-01').InstrumentationKey]"
+            },
+            {
+              "name": "FUNCTIONS_WORKER_RUNTIME",
+              "value": "[variables('functionWorkerRuntime')]"
+            },
+            {
+              "name": "SENDGRID_API_KEY",
+              "value": "[parameters('sendGridApiKey')]"
+            },
+            {
+              "name": "WARNING_EMAIL_FROM",
+              "value": "[parameters('warningEmailFrom')]"
+            },
+            {
+              "name": "WARNING_EMAIL_TO",
+              "value": "[parameters('warningEmailTo')]"
+            },
+            {
+              "name": "INACTIVITY_THRESHOLD_MINUTES",
+              "value": "60"
+            },
+            {
+              "name": "POST_WARNING_THRESHOLD_MINS",
+              "value": "15"
+            },
+            {
+              "name": "PERCENTAGE_CPU_STDEV_BASELINE_PERCENTAGE",
+              "value": "70"
+            },
+            {
+              "name": "NETWORK_OUT_STDEV_BASELINE_PERCENTAGE",
+              "value": "90"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "apiVersion": "2018-05-01-preview",
+      "name": "[variables('applicationInsightsName')]",
+      "type": "microsoft.insights/components",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', variables('applicationInsightsName'))]": "Resource"
+      },
+      "properties": {
+        "ApplicationId": "[variables('applicationInsightsName')]",
+        "Request_Source": "IbizaWebAppExtensionCreate"
+      }
+    }
+  ],
+  "outputs": {
+    "storageAccountName": {
+      "value": "[variables('storageAccountName')]",
+      "type": "string"
+    },
+    "functionAppName": {
+      "value": "[variables('functionAppName')]",
+      "type": "string"
+    }
+  }
+}
