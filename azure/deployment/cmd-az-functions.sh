@@ -6,6 +6,12 @@ pip install -r requirements.txt
 az group create --name rg-vmautostop --location southeastasia
 az storage account create --name stgvmautostop --resource-group rg-vmautostop
 
+az deployment create --location WestUS --template-file azuredeploy.json  \
+            --parameters @params.json --parameters https://mysite/params.json --parameters
+        MyValue=This MyArray=@array.json
+        
+az deployment create --template-file func-consumption.json --parameters @func-consumption.parameters.json 
+
 az functionapp create --name fn-vmautostop --resource-group rg-vmautostop \
     --consumption-plan-location southeastasia \
     --os-type Linux --runtime python --runtime-version 3.7 \
@@ -34,3 +40,17 @@ func new --name vmautostop  --template "TimerTrigger"
 func azure functionapp publish fn-vmautostop --build remote
 func start
 func azure functionapp publish fn-vmautostop --build remote --publish-local-settings
+
+az group delete --name rg-vmautostop1 --yes --no-wait
+az group create --name rg-vmautostop1 --location WestUS
+az group deployment create --resource-group rg-vmautostop1 \
+    --template-file vmautostop-func-cons.json --parameters @vmautostop-func-cons.parameters.json 
+
+az group deployment create --resource-group rg-vmautostop1 \
+    --template-file vmautostop-func-cons.json \
+    --parameters '{ "sendGridApiKey": {"value": "yourSgkey"}, 
+                    "warningEmailFrom": {"value": "vmautostop@youremail.com"}, 
+                    "warningEmailTo" :{"value": "John.Doe@youremail.com"}}'
+
+az storage account keys list --account-name stgvasaie6jbczrs3bk
+func azure functionapp publish fn-vmautostop-aie6jbczrs3bk --build remote --publish-local-settings
