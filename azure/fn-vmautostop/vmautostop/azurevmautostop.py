@@ -1,7 +1,7 @@
+from azure.mgmt.resource.subscriptions import SubscriptionClient
+from azure.mgmt.resource.resources.v2019_07_01 import ResourceManagementClient
 from azure.mgmt.compute import ComputeManagementClient
 from azure.mgmt.monitor import MonitorManagementClient
-from azure.mgmt.resource.resources.v2019_07_01 import ResourceManagementClient
-from azure.mgmt.subscription import SubscriptionClient
 import datetime
 import logging
 import re

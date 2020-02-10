@@ -1,8 +1,6 @@
 azure-functions
 msrestazure
-azure.mgmt.subscription
 azure.mgmt.resource
 azure.mgmt.compute
 azure.mgmt.monitor
 sendgrid
-# itertools
