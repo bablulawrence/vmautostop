@@ -1,0 +1,19 @@
+{
+  "Name": "Virtual Machine Auto Stop",
+  "IsCustom": true,
+  "Description": "Custom Role for Virtual Machine Auto Stop",
+  "Actions": [
+    "Microsoft.Resources/subscriptions/read",
+    "Microsoft.Resources/subscriptions/resourceGroups/read",
+    "Microsoft.Resources/resources/read",
+    "Microsoft.Compute/virtualMachines/instanceView/read",
+    "Microsoft.Insights/metrics/read",
+    "Microsoft.Resources/tags/write",
+    "Microsoft.Compute/virtualMachines/deallocate/action"
+  ],
+  "NotActions": [],
+  "AssignableScopes": [
+    "/subscriptions/00000000-0000-0000-0000-000000000000",
+    "/subscriptions/11111111-1111-1111-1111-111111111111"
+  ]
+}

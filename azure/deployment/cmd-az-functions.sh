@@ -61,3 +61,5 @@ az group deployment create --resource-group rg-vmautostop3 \
 az storage account keys list --account-name stgvasaie6jbczrs3bk
 func azure functionapp publish fn-vmautostop-aie6jbczrs3bk --build remote --publish-local-settings
 func azure functionapp publish fn-vmautostop-qdyj3x6uay7nc --build remote 
+
+az role definition create --role-definition ./vmautostop-role.json
