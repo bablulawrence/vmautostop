@@ -63,3 +63,11 @@ func azure functionapp publish fn-vmautostop-aie6jbczrs3bk --build remote --publ
 func azure functionapp publish fn-vmautostop-qdyj3x6uay7nc --build remote 
 
 az role definition create --role-definition ./vmautostop-role.json
+az role definition delete --name "Virtual Machine Auto Stop" --subscription 00000000-0000-0000-0000-000000000000 
+az functionapp show --name "<fuction app name>" --resource-group "<resource group name>" --query 'identity.principalId'
+
+az role assignment create --assignee "<service principle id>" \
+     --role "Virtual Machine Auto Stop" \
+     --subscription "<subscription id>"
+
+az role assignment list --subscription "<subscription id>"
