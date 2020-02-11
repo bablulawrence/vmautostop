@@ -5,9 +5,10 @@
   "Actions": [
     "Microsoft.Resources/subscriptions/read",
     "Microsoft.Resources/subscriptions/resourceGroups/read",
+    "Microsoft.Resources/subscriptions/resourceGroups/resources/read",
     "Microsoft.Resources/subscriptions/providers/read",
-    "Microsoft.Resources/subscriptions/resources/read",
     "Microsoft.Insights/metrics/read",
+    "Microsoft.Compute/virtualMachines/read",
     "Microsoft.Compute/virtualMachines/instanceView/read",
     "Microsoft.Compute/virtualMachines/write",
     "Microsoft.Compute/virtualMachines/deallocate/action"

@@ -23,6 +23,13 @@
         "description": "The instance size of the hosting plan."
       }
     },
+    "linuxFxVersion": {
+      "type": "string",
+      "defaultValue": "python|3.7",
+      "metadata": {
+        "description": "Runtime type and version"
+      }
+    },
     "storageAccountType": {
       "type": "string",
       "defaultValue": "Standard_LRS",
@@ -97,7 +104,7 @@
       "type": "Microsoft.Web/sites",
       "name": "[variables('functionAppName')]",
       "location": "[parameters('location')]",
-      "kind": "functionapp",
+      "kind": "functionapp,linux",
       "dependsOn": [
         "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
         "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
@@ -166,7 +173,8 @@
               "name": "NETWORK_OUT_STDEV_BASELINE_PERCENTAGE",
               "value": "90"
             }
-          ]
+          ],
+          "linuxFxVersion": "[parameters('linuxFxVersion')]"
         }
       }
     },
