@@ -21,6 +21,7 @@ Assumption here is that variance/standard deviation of CPU utilization and Netwo
 - A Tag with value set to timestamp of the notification email is used for marking the VM to be stopped.
 - Can use Azure Function Consumption plan or App Service Plan.
 - State is manged using Tags. No additional database/datastore requirement.
+- A Custom role used for providing just enough privileges required for app.
 
 ## Deploying to Azure
 
