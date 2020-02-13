@@ -1,12 +1,26 @@
 # Stop inactive Azure Virtual Machines automatically
 
-The app automatically stops(deallocates) Azure Virtual Machines if they are inactive for a while. Before stopping the VM, a warning email notification will be send. You have the flexibility to define:
+_Intended for optimizing dev/test virtual machine costs. Not recommended for VMs running Production, critical or continuous workloads._
 
-1. Which VMs are in the scope of the app. This can be done at the resource group level or VM level.
-2. Period of inactivity.
-3. Email to which the notification is to be sent.
+The app automatically stops(deallocates) Azure Virtual Machines if they are inactive for a predefined period of time. Before stopping the VM, a warning email notification will be send. You have the flexibility to change:
+
+1. Select VMs to be auto stopped by applying tags at resource group or individual VM level.
+2. Duration of inactivity.
+3. Email to which the notifications are to be sent.
+4. Interval between sending notification and stopping VM.
+5. Parameter values which determines VM inactivity.
 
 ## How it works
+
+An Azure Function app runs every minute and reads VM metric values - `Percentage CPU` and `Network Out` and calculates their standard deviation. If the standard deviation is less than the predefined threshold then VM is deemed inactive and a warning email is sent. Subsequently VM is stopped if it continues to be inactive.
+
+Assumption here is that variance/standard deviation of CPU utilization and Network traffic for an active VM is much higher than an inactive one. This is certainly true for VMs which has users logged in using SSH(Linux) or Remote Desktop(Windows) to performing dev/test activities. App might not be suitable for machines which run more non-variable workloads.
+
+- Uses Azure Python Functions and Azure SDK for python.
+- Tags are used for selecting or deselecting VMs to auto stop and providing runtime overrides for parameter values.
+- A Tag with value set to timestamp of the notification email is used for marking the VM to be stopped.
+- Can use Azure Function Consumption plan or App Service Plan.
+- State is manged using Tags. No additional database/datastore requirement.
 
 ## Deploying to Azure
 
@@ -63,7 +77,7 @@ The app automatically stops(deallocates) Azure Virtual Machines if they are inac
    ```sh
    az group deployment create --resource-group rg-vmautostop \
       --template-file vmautostop-func-dedicated.json \
-      --parameters '{ "sendGridApiKey": {"value": "SG.XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"},
+      --parameters '{ "sendGridApiKey": {"value": "SG.XXXXXXXXXXXXXXXXXXXXXXX"},
                      "warningEmailFrom": {"value": "vmautostop@gmail.com"},
                      "warningEmailTo" :{"value": "John.Doe@gmail.com"}}'
    ```
