@@ -145,11 +145,11 @@
             },
             {
               "name": "PERCENTAGE_CPU_STDEV_BASELINE_PERCENTAGE",
-              "value": "70"
+              "value": "50"
             },
             {
               "name": "NETWORK_OUT_STDEV_BASELINE_PERCENTAGE",
-              "value": "90"
+              "value": "50"
             }
           ]
         }
