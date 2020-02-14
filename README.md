@@ -145,7 +145,7 @@ Behavior of the app is controlled by a set of parameters described in the below 
 | SENDGRID_API_KEY                         | Cannot be overridden | API Key for the Azure SendGrid account.                                                  |
 | WARNING_EMAIL_FROM                       | WARN_EMAIL_FROM      | Email id `From` which notification is sent.                                              |
 | WARNING_EMAIL_TO                         | WARN_EMAIL_TO        | Email id `To` which notification is sent.                                                |
-| INACTIVITY_THRESHOLD_MINUTES             | INACTIVITY_TH_MIN    | Duration for which VM can remain inactive. Default value is 60 minutes.                  |
+| INACTIVITY_THRESHOLD_MINUTES             | INACTIVITY_TH_MIN    | Duration for which VM can remain inactive. Default is 60 minutes.                        |
 | POST_WARNING_THRESHOLD_MINS              | POST_WARN_TH_MINS    | Interval between sending notification email and stopping VM. Default is 15 mins.         |
 | PERCENTAGE_CPU_STDEV_BASELINE_PERCENTAGE | CPU_STDEV_BAS_PCT    | Baseline standard deviation for `Percent CPU` as percentage of mean. Default is 50%.     |
 | NETWORK_OUT_STDEV_BASELINE_PERCENTAGE    | NETW_STDEV_BAS_PCT   | Baseline standard deviation for `Network Out CPU` as percentage of mean. Default is 50%. |
