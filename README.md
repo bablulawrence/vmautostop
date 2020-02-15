@@ -58,7 +58,8 @@ Salient points:
 ### Deployment Steps
 
 1. Add you subscription to the custom role for the function app.
-   Open custom role template file `vmautostop-custom-role.json` and your subscriptions to `"AssignableScopes"`.
+
+   Open custom role template file `vmautostop-custom-role.json` and your subscriptions to `"AssignableScopes"`, e.g.:
 
    ```json
    "AssignableScopes": [
@@ -79,7 +80,7 @@ Salient points:
    az group create --name <Resource group name> --location <Location>
    ```
 
-   example:
+   e.g.:
 
    ```sh
    az group create --name rg-vmautostop --location WestUS
@@ -95,7 +96,7 @@ Salient points:
                      "warningEmailTo" :{"value": "<To email id for sending warning email>"}}'
    ```
 
-   example:
+   e.g.:
 
    ```sh
    az group deployment create --resource-group rg-vmautostop \
@@ -113,7 +114,7 @@ Salient points:
       --query 'identity.principalId'
    ```
 
-   example:
+   e.g.:
 
    ```sh
    az functionapp show --name fn-vmautostop-kjfmr2d6ddosw \
@@ -129,7 +130,7 @@ Salient points:
         --subscription <Subscription id>
    ```
 
-   example:
+   e.g.:
 
    ```sh
    az role assignment create --assignee "ec359a23-0de2-47d6-a45d-67922448061a" \
@@ -143,7 +144,7 @@ Salient points:
    func azure functionapp publish <Function app name> --build remote
    ```
 
-   example:
+   e.g.:
 
    ```sh
    func azure functionapp publish fn-vmautostop-kjfmr2d6ddosw --build remote
@@ -157,7 +158,7 @@ App adds another resource tag(timestamp tag) - `VM_AUTO_STOP_EMAIL_TIMESTAMP` to
 
 ### Setting parameter values
 
-Behavior of the app is controlled by a set of parameters described below. Default values for these parameters are set in the function app app settings at the time of deployment. At runtime, these values can be overridden for and individual VM or group of VMs(parameter tag at resource group level) by appending parameter values to the value of parameter tag - `VM_AUTO_STOP_PARAMS`, separated by semicolon`.
+Behavior of the app is controlled by a set of parameters described below. Default values for these parameters are set in the function app app settings at the time of deployment. At runtime, these values can be overridden for and individual VM or group of VMs(parameter tag at resource group level) by appending parameter values to the value of parameter tag - `VM_AUTO_STOP_PARAMS`, separated by semicolon.
 
 | Parameters - App Settings                | Parameters - Tag     | Description                                                                              |
 | ---------------------------------------- | -------------------- | ---------------------------------------------------------------------------------------- |
@@ -174,7 +175,7 @@ For example, following image shows how to override default values for parameters
 
 ![Tag Example1](./images/az-vmautostop-tag-example1.png)
 
-Parameter values set at the VM level will override if(any) of the same parameter values set at the resource group level. This is useful if you want auto stop behavior to be different for some of the VMs in a resource group. For example, you want notification email to for a particular VM to be sent to a different email id than the one specified at the resource group level - therefore used by all VMs in the group or want to reduce the inactivity threshold etc.
+Parameter values set at the VM level will override if(any) of the same parameter values set at the resource group level. This is useful if you want auto stop behavior to be different for some of the VMs in a resource group, e.g., you want notification email to for a particular VM to be sent to a different email id than the one specified at the resource group level - therefore used by all VMs in the group or want to reduce the inactivity threshold etc.
 
 ## References
 
