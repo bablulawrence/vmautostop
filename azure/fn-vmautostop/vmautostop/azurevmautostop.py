@@ -13,6 +13,10 @@ TIMESTAMP_TAG = "VM_AUTO_STOP_EMAIL_TIMESTAMP"
 
 
 class Subscription:
+    """
+    This class provides functionality to get necessary details from azure subscriptions.
+    """
+
     def __init__(self, credentials, subscription_id, email_client):
         self.subscription_id = subscription_id
         self.resource_client = ResourceManagementClient(credentials,
@@ -26,6 +30,9 @@ class Subscription:
 
     @classmethod
     def get_subscriptions(cls, credentials, email_client):
+        """
+        Gets the list of subscriptions that app has access to.         
+        """
         subscription_client = SubscriptionClient(credentials)
         subscriptions = subscription_client.subscriptions.list()
         return [cls(credentials, sub["subscription_id"], email_client)
@@ -33,6 +40,9 @@ class Subscription:
                             for sub_itr in subscriptions]]
 
     def __extract_params(self, tag_value):
+        """
+        Extracts parameters and values from the parameter tag.         
+        """
         params = [param.strip().split("=")
                   for param in tag_value.strip().split(";")]
         tags = {}
@@ -42,6 +52,9 @@ class Subscription:
 
     def get_virtual_machines(self, default_inactivity_th_mins, default_post_warning_th_mins,
                              default_percentage_cpu_stdev_bas_pct, default_network_out_stdev_bas_pct):
+        """
+        Gets the resource details for all virtual machines in the subscription.         
+        """
         virtual_machines = [vm.__dict__ for vm in self.resource_client.resources.list(
             filter="resourceType eq 'Microsoft.Compute/virtualMachines'")]
         vms = []
@@ -68,6 +81,10 @@ class Subscription:
 
 
 class VirtualMachine:
+    """
+    This class provides functionality to read VM status, get metrics, send notification and stop VM.
+    """
+
     def __init__(self, subscription, resource_group_name,
                  resource_id, name, tags, params,
                  default_inactivity_th_mins, default_post_warning_th_mins,
@@ -130,11 +147,17 @@ class VirtualMachine:
             self.network_out_stdev_bas_pct = default_network_out_stdev_bas_pct
 
     def get_instance_status(self):
+        """
+        Gets the status on the VM.
+        """
         return self.subscription.compute_client.virtual_machines.instance_view(
             self.resource_group_name,
             self.name).statuses[-1].code
 
     def get_metrics(self, timestamp):
+        """
+        Gets the metrics values for the VM and calculates aggregate metrics.
+        """
         adj_curr_time = timestamp - datetime.timedelta(minutes=3)
         start_time = (adj_curr_time - datetime.timedelta(minutes=self.inactivity_threshold)
                       ).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -173,9 +196,15 @@ class VirtualMachine:
         return metrics_agg
 
     def __warning_email_timestamp_exits(self):
+        """
+        Checks whether the warning email timestamp tag exists in the VM.
+        """
         return True if self.tags and TIMESTAMP_TAG in self.tags.keys() else False
 
     def __get_warning_email_timestamp(self):
+        """
+        Gets the value of the warning email timestamp.
+        """
         if self.__warning_email_timestamp_exits():
             try:
                 warning_email_timestamp = datetime.datetime.fromisoformat(
@@ -189,18 +218,27 @@ class VirtualMachine:
         return warning_email_timestamp
 
     def __set_warning_email_timestamp(self, timestamp):
+        """
+        Sets the warning email timestamp.
+        """
         self.tags[TIMESTAMP_TAG] = timestamp.isoformat()
         self.subscription.resource_client.resources.update_by_id(self.resource_id,
                                                                  "2019-07-01",
                                                                  {'tags': self.tags})
 
     def __delete_warning_email_timestamp(self):
+        """
+        Deletes the warning email timestamp.
+        """
         del self.tags[TIMESTAMP_TAG]
         self.subscription.resource_client.resources.update_by_id(self.resource_id,
                                                                  "2019-07-01",
                                                                  {'tags': self.tags})
 
     def __send_warning(self, timestamp):
+        """
+        Sends the warning email.
+        """
         subject = f"VM Auto Stop Warning: {timestamp.strftime('%Y-%m-%dT%H:%M:%SZ')} - {self.name}"
         body = (f"Virtual Machine - <strong> {self.resource_id} </strong> is inactive "
                 f"and will be stopped in {self.post_warning_th_mins} mins")
@@ -214,6 +252,9 @@ class VirtualMachine:
             return False
 
     def stop(self, timestamp):
+        """
+        Stops the VM if the inactivity criteria is met.
+        """
         action = "None"
         instance_status = self.get_instance_status()
         metrics = self.get_metrics(timestamp)

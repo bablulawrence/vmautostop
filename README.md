@@ -7,7 +7,7 @@ At present Azure gives you below approaches to reduce compute cost of Azure Virt
 - [Stop VMs during off-hours using Virtual Machine Auto-Shutdown](https://azure.microsoft.com/en-in/blog/announcing-auto-shutdown-for-vms-using-azure-resource-manager/).
 - [Start/Stop VMs using Azure Automation](https://docs.microsoft.com/en-us/azure/automation/automation-solution-vm-management).
 
-These approaches require setup to be done for each individual VM separately. However, If you have a lot of VMs spread across multiple resource groups in different subscriptions, setting up and managing these solutions takes lot of work. In other words, these solution doesn't scale very well.
+These approaches require setup to be done for each individual VM separately. However, If you have lot of VMs spread across multiple resource groups in different subscriptions, setting up and managing these solutions takes lot of work. In other words, these solution doesn't scale very well.
 
 This app is an attempt to solve some of these problems. Using this you will be able to select all VMs in resource group for auto stopping by adding a resource tag and setting its value to `AUTO_STOP=Y`. The app will automatically stop VMs if they are inactive for a predefined period of time. An email notification will be sent prior to stopping the VM.
 
