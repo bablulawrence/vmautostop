@@ -7,9 +7,9 @@ At present Azure gives you below approaches to reduce compute cost of Azure Virt
 - [Stop VMs during off-hours using Virtual Machine Auto-Shutdown](https://azure.microsoft.com/en-in/blog/announcing-auto-shutdown-for-vms-using-azure-resource-manager/).
 - [Start/Stop VMs using Azure Automation](https://docs.microsoft.com/en-us/azure/automation/automation-solution-vm-management).
 
-These approaches require setup to be done for each individual VM separately. If you have a lot of VMs spread across multiple resource groups in different subscriptions,setting up and managing these solutions take lot of work. In other words, These solution doesn't scale very well.
+These approaches require setup to be done for each individual VM separately. If you have a lot of VMs spread across multiple resource groups in different subscriptions, setting up and managing these solutions takes lot of work. In other words, These solution doesn't scale very well.
 
-This app is an attempt to solve this problem. Using this you will be able to select all VMs in resource group for auto stopping by adding a resource tag and setting its value to `AUTO_STOP=Y`. The app will automatically stop VMs if they are inactive for a predefined period of time. An email notification will be send prior to stopping the VM.
+This app is an attempt to solve this problem. Using this you will be able to select all VMs in resource group for auto stopping by adding a resource tag and setting its value to `AUTO_STOP=Y`. The app will automatically stop VMs if they are inactive for a predefined period of time. An email notification will be sent prior to stopping the VM.
 
 You have the flexibility to:
 
@@ -22,9 +22,9 @@ You have the flexibility to:
 
 ## How it works
 
-An Azure Function app runs every minute and gets a list of VMs in the subscriptions that it has given access to. It then reads VM metric values - `Percentage CPU` and `Network Out` and calculates their standard deviation. If the standard deviation is less than the predefined threshold, VM is deemed inactive and a warning email is sent. Subsequently VM is stopped if it continues to be inactive.
+An Azure Function app runs every minute and gets a list of VMs in the subscriptions that it has access to. It then reads VM metric values - `Percentage CPU` and `Network Out` and calculates their standard deviation. If the standard deviation is less than the predefined threshold, VM is deemed inactive and a warning email is sent. Subsequently VM is stopped if it continues to be inactive.
 
-Assumption here is that variance/standard deviation of CPU utilization and Network traffic for an inactive VM is lower than an active one. This is certainly true for VMs which has users logged in using SSH(Linux) or Remote Desktop(Windows) to performing dev/test activities. But might not be applicable for VMs running workloads with uniform resource consumption patterns. Therefore the app might not be appropriate in such cases.
+Assumption is that the variance/standard deviation of CPU utilization and Network traffic for an inactive VM is lower than an active one. This is certainly true for VMs which has users logged in using SSH(Linux) or Remote Desktop(Windows) to performing dev/test activities. But might not be applicable for VMs running workloads with uniform resource consumption patterns. Therefore the app might not be appropriate in such cases.
 
 Salient points:
 
@@ -55,7 +55,7 @@ Salient points:
 
   Clone this repo. You will find the ARM templates for deploying the function app and associated storage account, application insights etc. in the `Azure` folder. Move to it and execute the following commands for deploying the app.
 
-### Deployment Instructions
+### Deployment Steps
 
 1. Add you subscription to the custom role for the function app.
    Open custom role template file `vmautostop-custom-role.json` and your subscriptions to `"AssignableScopes"`.
