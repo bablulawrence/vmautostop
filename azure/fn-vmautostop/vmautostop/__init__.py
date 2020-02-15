@@ -21,6 +21,9 @@ default_network_out_stdev_bas_pct = float(os.environ.get(
 
 
 def get_credentials():
+    """
+    Gets Azure AD auth credentials.
+    """
     return MSIAuthentication()
 
 
