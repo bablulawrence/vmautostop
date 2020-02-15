@@ -9,7 +9,7 @@ At present Azure gives you below approaches to reduce compute cost of Azure Virt
 
 These approaches require setup to be done for each individual VM separately. If you have a lot of VMs spread across multiple resource groups in different subscriptions, setting up and managing these solutions takes lot of work. In other words, these solution doesn't scale very well.
 
-This app is an attempt to solve this problem. Using this you will be able to select all VMs in resource group for auto stopping by adding a resource tag and setting its value to `AUTO_STOP=Y`. The app will automatically stop VMs if they are inactive for a predefined period of time. An email notification will be sent prior to stopping the VM.
+This app is an attempt to solve some of these problems. Using this you will be able to select all VMs in resource group for auto stopping by adding a resource tag and setting its value to `AUTO_STOP=Y`. The app will automatically stop VMs if they are inactive for a predefined period of time. An email notification will be sent prior to stopping the VM.
 
 You have the flexibility to:
 
@@ -22,9 +22,7 @@ You have the flexibility to:
 
 ## How it works
 
-An Azure Function app runs every minute and gets a list of VMs in the subscriptions that it has access to. It then reads VM metric values - `Percentage CPU` and `Network Out` and calculates their standard deviation. If the standard deviation is less than the predefined threshold, VM is deemed inactive and a warning email is sent. Subsequently VM is stopped if it continues to be inactive.
-
-Assumption is that the variance/standard deviation of CPU utilization and Network traffic for an inactive VM is lower than an active one. This is certainly true for VMs which has users logged in using SSH(Linux) or Remote Desktop(Windows) to performing dev/test activities. But might not be applicable for VMs running workloads with uniform resource consumption patterns. Therefore the app might not be appropriate in such cases.
+Assumption is that the variance/standard deviation of CPU utilization and Network traffic for an inactive VM is lower than an active one. This is certainly seems true for VMs which has users logged in using SSH(Linux) or Remote Desktop(Windows) to performing dev/test activities. However this assumption might not be applicable for VMs running workloads with uniform resource consumption patterns and therefore app might not be useful for such cases.
 
 Salient points:
 
