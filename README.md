@@ -1,22 +1,32 @@
-# VmAutoStop - an app for stopping inactive Azure Virtual Machines automatically
+# VmAutoStop - an app for stopping(deallocating) inactive Azure Virtual Machines automatically
 
 _Intended for optimizing compute costs of dev/test virtual machines. Not recommended for VMs running production or critical workloads._
 
-The app automatically stops(deallocates) Azure Virtual Machines if they are inactive for a predefined period of time. Before stopping the VM, a warning email notification will be send. You have the flexibility to change:
+At present Azure gives you below approaches to reduce compute cost of Azure Virtual Machines with variable usage pattern - such as the ones used for development and testing.
+
+- [Stop VMs during off-hours using Virtual Machine Auto-Shutdown](https://azure.microsoft.com/en-in/blog/announcing-auto-shutdown-for-vms-using-azure-resource-manager/).
+- [Start/Stop VMs using Azure Automation](https://docs.microsoft.com/en-us/azure/automation/automation-solution-vm-management).
+
+These approaches require setup to be done for each individual VM separately. If you have a lot of VMs spread across multiple resource groups in different subscriptions,setting up and managing these solutions take lot of work. In other words, These solution doesn't scale very well.
+
+This app is an attempt to solve this problem. Using this you will be able to select all VMs in resource group for auto stopping by adding a resource tag and setting its value to `AUTO_STOP=Y`. The app will automatically stop VMs if they are inactive for a predefined period of time. An email notification will be send prior to stopping the VM.
+
+You have the flexibility to:
 
 1. Select VMs to be auto stopped by applying tags at resource group or individual VM level.
-2. Duration of inactivity.
-3. Email to which the notifications are to be sent.
-4. Interval between sending notification email and stopping VM.
-5. Parameter values which determines VM inactivity.
+2. Selectively exclude VMs from auto stop.
+3. Set duration of inactivity.
+4. Change email to which the notifications are sent.
+5. Change interval between sending notification email and stopping VM.
+6. Change thresholds for metric values that determine VM inactivity.
 
 ## How it works
 
-An Azure Function app runs every minute and reads VM metric values - `Percentage CPU` and `Network Out` and calculates their standard deviation. If the standard deviation is less than the predefined threshold then VM is deemed inactive and a warning email is sent. Subsequently VM is stopped if it continues to be inactive.
+An Azure Function app runs every minute and gets a list of VMs in the subscriptions that it has given access to. It then reads VM metric values - `Percentage CPU` and `Network Out` and calculates their standard deviation. If the standard deviation is less than the predefined threshold, VM is deemed inactive and a warning email is sent. Subsequently VM is stopped if it continues to be inactive.
 
-**Assumption here is that variance/standard deviation of CPU utilization and Network traffic for an inactive VM is significantly lower than an active one. This is certainly true for VMs which has users logged in using SSH(Linux) or Remote Desktop(Windows) to performing dev/test activities**. App might not be suitable for machines which run more non-variable workloads.
+Assumption here is that variance/standard deviation of CPU utilization and Network traffic for an inactive VM is lower than an active one. This is certainly true for VMs which has users logged in using SSH(Linux) or Remote Desktop(Windows) to performing dev/test activities. But might not be applicable for VMs running workloads with uniform resource consumption patterns. Therefore the app might not be appropriate in such cases.
 
-Salient features:
+Salient points:
 
 - Developed using Azure Python Functions and Azure SDK for python.
 - Resource tags are used for selecting or deselecting VMs to auto stop and providing runtime overrides for parameter values.
@@ -47,13 +57,23 @@ Salient features:
 
 ### Deployment Instructions
 
-1. Create custom role for the function app.
+1. Add you subscription to the custom role for the function app.
+   Open custom role template file `vmautostop-custom-role.json` and your subscriptions to `"AssignableScopes"`.
+
+   ```json
+   "AssignableScopes": [
+      "/subscriptions/00000000-0000-0000-0000-000000000000",
+      "/subscriptions/11111111-1111-1111-1111-111111111111"
+   ]
+   ```
+
+1. Create the custom role.
 
    ```sh
    az role definition create --role-definition ./vmautostop-custom-role.json
    ```
 
-2. Create resource group for deploying the function app, storage account and application insights.
+1. Create resource group for deploying the function app, storage account and application insights.
 
    ```sh
    az group create --name <Resource group name> --location <Location>
@@ -65,7 +85,7 @@ Salient features:
    az group create --name rg-vmautostop --location WestUS
    ```
 
-3. Create the function app, storage account and application insights.
+1. Create the function app, storage account and application insights.
 
    ```sh
    az group deployment create --resource-group <Resource group name> \
@@ -85,7 +105,7 @@ Salient features:
                      "warningEmailTo" :{"value": "John.Doe@gmail.com"}}'
    ```
 
-4. Get the service principle id of the function app.
+1. Get the service principle id of the function app.
 
    ```sh
    az functionapp show --name <Function app name> \
@@ -101,7 +121,7 @@ Salient features:
       --query 'identity.principalId'
    ```
 
-5. Assign the custom role to the function app.
+1. Assign the custom role to the function app.
 
    ```sh
    az role assignment create --assignee <Service principle id> \
@@ -117,7 +137,7 @@ Salient features:
      --subscription "3af84b10-189c-40a6-b66c-2905fcc0ea9d"
    ```
 
-6. Build and publish the function app.
+1. Build and publish the function app.
 
    ```sh
    func azure functionapp publish <Function app name> --build remote
@@ -137,7 +157,7 @@ App adds another resource tag(timestamp tag) - `VM_AUTO_STOP_EMAIL_TIMESTAMP` to
 
 ### Setting parameter values
 
-Behavior of the app is controlled by a set of parameters described in the below table. Default values for these parameters are set in the function app app settings at the time of deployment. At runtime, these values can be overridden for and individual VM or group of VMs(parameter tag at resource group level) by appending parameter values to the value of parameter tag - `VM_AUTO_STOP_PARAMS`, separated by semicolon`.
+Behavior of the app is controlled by a set of parameters described below. Default values for these parameters are set in the function app app settings at the time of deployment. At runtime, these values can be overridden for and individual VM or group of VMs(parameter tag at resource group level) by appending parameter values to the value of parameter tag - `VM_AUTO_STOP_PARAMS`, separated by semicolon`.
 
 | Parameters - App Settings                | Parameters - Tag     | Description                                                                              |
 | ---------------------------------------- | -------------------- | ---------------------------------------------------------------------------------------- |
@@ -158,7 +178,7 @@ Parameter values set at the VM level will override if(any) of the same parameter
 
 ## References
 
-- [Azure functions python developer guide](https://docs.microsoft.com/en-us/azure/azure-functions/functions-reference-python)
-- [Azure python SDK](https://docs.microsoft.com/en-us/azure/python/)
-- [Managed identities for Azure resources](https://docs.microsoft.com/en-us/azure/active-directory/managed-identities-azure-resources/overview)
-- [Custom roles for Azure resources](https://docs.microsoft.com/en-us/azure/role-based-access-control/custom-roles)
+- [Azure functions python developer guide](https://docs.microsoft.com/en-us/azure/azure-functions/functions-reference-python).
+- [Azure python SDK](https://docs.microsoft.com/en-us/azure/python/).
+- [Managed identities for Azure resources](https://docs.microsoft.com/en-us/azure/active-directory/managed-identities-azure-resources/overview).
+- [Custom roles for Azure resources](https://docs.microsoft.com/en-us/azure/role-based-access-control/custom-roles).
