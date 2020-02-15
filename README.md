@@ -1,4 +1,4 @@
-# VmAutoStop - an app for stopping(deallocating) inactive Azure Virtual Machines automatically
+# VmAutoStop - stop(deallocate) inactive Azure Virtual Machines automatically
 
 _Intended for optimizing compute costs of dev/test virtual machines. Not recommended for VMs running production or critical workloads._
 
