@@ -22,7 +22,7 @@ You have the flexibility to:
 
 ## How it works
 
-Assumption is that the variance/standard deviation of CPU utilization and Network traffic for an inactive VM is lower than an active one. This is certainly seems true for VMs which has users logged in using SSH(Linux) or Remote Desktop(Windows) to performing dev/test activities. However this assumption might not be applicable for VMs running workloads with uniform resource consumption patterns and therefore app might not be useful for such cases.
+Assumption is that the variance/standard deviation of CPU utilization and Network traffic for an inactive VM is lower than an active one. This certainly seems true for VMs which has users logged in using SSH(Linux) or Remote Desktop(Windows) to performing dev/test activities. However this assumption might not be applicable for VMs running workloads with uniform resource consumption patterns and therefore app might not be useful for such cases.
 
 Salient points:
 
