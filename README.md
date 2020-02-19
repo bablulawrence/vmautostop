@@ -57,7 +57,7 @@ Salient points:
 
 ### Deployment Steps
 
-1. Add you subscription to the custom role for the function app.
+1. Add you subscription(s) to the custom role for the function app.
 
    Open custom role template file `vmautostop-custom-role.json` and your subscriptions to `"AssignableScopes"`, e.g.:
 
@@ -141,6 +141,7 @@ Salient points:
 1. Build and publish the function app.
 
    ```sh
+   cd fn-vmautostop
    func azure functionapp publish <Function app name> --python --build remote
    ```
 
@@ -154,7 +155,7 @@ Salient points:
 
 VM(s) in a subscription can be selected for auto stopping by adding a resource tag(parameter tag) - `VM_AUTO_STOP_PARAMS` with value set to `AUTO_STOP=Y`. Also you can select all VMs in a resource group by adding the parameter tag to the resource group; in this case you can exclude a VM or set of VMs in the same resource group by setting their tag value to `AUTO_STOP=N`.
 
-App adds another resource tag(timestamp tag) - `VM_AUTO_STOP_EMAIL_TIMESTAMP` to the VM at the time of sending notification email and sets its value to the current timestamp(UTC format). This is used by the app to keep track of the time elapsed after notification is sent. App will delete this tag before shutting down the VM or if it becomes active again.
+The app adds another resource tag(timestamp tag) - `VM_AUTO_STOP_EMAIL_TIMESTAMP` to the VM at the time of sending notification email and sets its value to the current timestamp(UTC format). This is used by the app to keep track of the time elapsed after notification is sent. App will delete this tag before shutting down the VM or if it becomes active again.
 
 ### Setting parameter values
 
