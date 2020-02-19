@@ -139,7 +139,7 @@ Salient points:
 1. Build and publish the function app.
 
    ```sh
-   func azure functionapp publish <Function app name> --build remote
+   func azure functionapp publish <Function app name> --python --build remote
    ```
 
    e.g.:
