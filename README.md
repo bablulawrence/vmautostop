@@ -22,6 +22,8 @@ You have the flexibility to:
 
 ## How it works
 
+An Azure Function app runs every minute and gets a list of VMs in the subscriptions that it has access to. It then reads VM metric values - Percentage CPU and Network Out and calculates their standard deviation. If the standard deviation is less than the predefined threshold, VM is deemed inactive and a warning email is sent. Subsequently VM is stopped if it continues to be inactive.
+
 Assumption is that the variance/standard deviation of CPU utilization and Network traffic for an inactive VM is lower than an active one. This certainly seems true for VMs which has users logged in using SSH(Linux) or Remote Desktop(Windows) to performing dev/test activities. However this assumption might not be applicable for VMs running workloads with uniform resource consumption patterns and therefore app might not be useful for such cases.
 
 Salient points:
