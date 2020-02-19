@@ -120,7 +120,7 @@ Salient points:
       --query 'identity.principalId'
    ```
 
-1. Assign the custom role to the function app.
+1. Assign the custom role to the function app. Repeat this for all subscriptions with VMs to be auto stopped.
 
    ```sh
    az role assignment create --assignee <Service principle id> \
@@ -133,7 +133,7 @@ Salient points:
    ```sh
    az role assignment create --assignee "ec359a23-0de2-47d6-a45d-67922448061a" \
      --role "Virtual Machine Auto Stop" \
-     --subscription "3af84b10-189c-40a6-b66c-2905fcc0ea9d"
+     --subscription "11111111-1111-1111-1111-111111111111"
    ```
 
 1. Build and publish the function app.
@@ -145,7 +145,7 @@ Salient points:
    e.g.:
 
    ```sh
-   func azure functionapp publish fn-vmautostop-kjfmr2d6ddosw --build remote
+   func azure functionapp publish fn-vmautostop-kjfmr2d6ddosw --python --build remote
    ```
 
 ### Selecting VMs to auto stop
